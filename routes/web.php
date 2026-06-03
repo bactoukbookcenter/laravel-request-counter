@@ -19,3 +19,8 @@ Route::post('/reset', function () {
     Cache::put('request_count', 0);
     return redirect('/count');
 });
+
+Route::post('/api/reset', function () {
+    Cache::put('request_count', 0);
+    return response()->json(['ok' => true]);
+});
