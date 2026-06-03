@@ -8,7 +8,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN install-php-extensions intl opentelemetry-stable
+RUN install-php-extensions intl \
+    && pecl install opentelemetry \
+    && docker-php-ext-enable opentelemetry
 
 WORKDIR /var/www/html
 
