@@ -17,7 +17,8 @@ COPY docker/opentelemetry-1.2.1.tgz /tmp/
 RUN install-php-extensions intl \
     && pecl install /tmp/opentelemetry-1.2.1.tgz \
     && docker-php-ext-enable opentelemetry \
-    && rm /tmp/opentelemetry-1.2.1.tgz
+    && rm /tmp/opentelemetry-1.2.1.tgz \
+    && echo 'alias art="php artisan"' >> /etc/bash.bashrc
 
 WORKDIR /var/www/html
 
