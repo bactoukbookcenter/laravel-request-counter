@@ -1,3 +1,17 @@
+## Getting Started
+
+```
+OTEL_PHP_DISABLED_INSTRUMENTATIONS=all composer install --ignore-platform-req=ext-opentelemetry
+
+art octane:start --watch
+```
+OR
+
+```
+composer install --ignore-platform-reqs
+OTEL_PHP_DISABLED_INSTRUMENTATIONS=all composer dump-autoload
+```
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
