@@ -1,4 +1,4 @@
-FROM serversideup/php:8.5-frankenphp
+FROM --platform=linux/amd64 serversideup/php:8.5-frankenphp
 
 ARG NODE_VERSION=22
 
@@ -8,9 +8,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+COPY docker/opentelemetry-1.2.1.tgz /tmp/
+
 RUN install-php-extensions intl \
-    && pecl install opentelemetry \
-    && docker-php-ext-enable opentelemetry
+    && pecl install /tmp/opentelemetry-1.2.1.tgz \
+    && docker-php-ext-enable opentelemetry \
+    && rm /tmp/opentelemetry-1.2.1.tgz
 
 WORKDIR /var/www/html
 
