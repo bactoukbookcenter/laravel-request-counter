@@ -34,9 +34,6 @@ COPY --from=assets /app/public/build ./public/build
 # Complete composer install (autoloader, scripts)
 RUN composer install --no-dev --prefer-dist --optimize-autoloader
 
-# Generate the FrankenPHP Octane worker file
-RUN php artisan octane:install --server=frankenphp --no-interaction
-
 # Ensure Laravel's required runtime directories exist (excluded from .dockerignore)
 RUN mkdir -p storage/framework/cache/data \
               storage/framework/sessions \
