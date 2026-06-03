@@ -1,12 +1,16 @@
+FROM --platform=$BUILDPLATFORM node:22-slim AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY resources/ ./resources/
+COPY vite.config.js public/ ./
+RUN npm run build
+
 FROM --platform=linux/amd64 serversideup/php:8.5-frankenphp
 
 ARG NODE_VERSION=22
 
 USER root
-
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY docker/opentelemetry-1.2.1.tgz /tmp/
 
@@ -21,18 +25,17 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
-# Copy package files and build frontend assets
-COPY package.json package-lock.json ./
-RUN npm ci
-
 # Copy the rest of the application
 COPY . .
+
+# Copy pre-built frontend assets from native build stage
+COPY --from=assets /app/public/build ./public/build
 
 # Complete composer install (autoloader, scripts)
 RUN composer install --no-dev --prefer-dist --optimize-autoloader
 
-# Build frontend assets
-RUN npm run build && rm -rf node_modules
+# Generate the FrankenPHP Octane worker file
+RUN php artisan octane:install --server=frankenphp --no-interaction
 
 # Ensure Laravel's required runtime directories exist (excluded from .dockerignore)
 RUN mkdir -p storage/framework/cache/data \
@@ -47,3 +50,5 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
 USER www-data
+
+CMD ["php", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8080"]
